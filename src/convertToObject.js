@@ -2,22 +2,34 @@
 
 /**
  * @param {string} sourceString
- *
  * @return {object}
  */
 function convertToObject(sourceString) {
-  let split = sourceString.split(';');
+  const declarations = sourceString
+    .split(';')
+    .map((s) => s.trim())
+    .filter(Boolean);
 
-  split = split.map((item) => item.trim()).filter((item) => item.length > 0);
-  split = split.map((item) => item.split(':').map((item2) => item2.trim()));
+  const styleMap = declarations.reduce((acc, decl) => {
+    const idx = decl.indexOf(':');
 
-  const obj = {};
+    if (idx === -1) {
+      return acc;
+    }
 
-  for (const item of split) {
-    obj[item[0]] = item[1];
-  }
+    const property = decl.slice(0, idx).trim();
+    const value = decl.slice(idx + 1).trim();
 
-  return obj;
+    if (!property || !value) {
+      return acc;
+    }
+
+    acc[property] = value;
+
+    return acc;
+  }, {});
+
+  return styleMap;
 }
 
 module.exports = convertToObject;
